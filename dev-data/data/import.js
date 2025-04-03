@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const Tour = require('./../../models/tourmodel');
-dotenv.config({ path: './config.env' });
+dotenv.config({ path: './../../config.env' });
 
 mongoose
   .connect(process.env.DATABASE, {
@@ -37,4 +37,8 @@ const deleteData = async () => {
   process.exit();
 };
 
-console.log(process.argv);
+if (process.argv[2] === '--import') {
+  importData();
+} else if (process.argv[2] === '--delete') {
+  deleteData();
+}

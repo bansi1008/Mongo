@@ -1,18 +1,39 @@
 const Tour = require('./../models/tourmodel');
 
 exports.getAllTours = async (req, res) => {
-  const tours = await Tour.find();
+  try {
+    // Uncomment the following if you want to filter tours by specific conditions:
+    // const tours = await Tour.find({
+    //   duration: 5,
+    //   difficulty: 'easy'
+    // });
+    const queryObj = { ...req.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+    excludedFields.forEach(el => delete queryObj[el]);
 
-  res.status(200).json({
-    status: 'success',
-    // requestedAt: req.requestTime,
-    results: tours.length,
-    data: {
-      tours
-    }
-  });
+    const tours = await Tour.find(queryObj);
+    // Uncomment and use .where() method for chaining specific queries:
+    // .where('duration')
+    // .equals(5)
+    // .where('difficulty')
+    // .equals('easy');
+
+    res.status(200).json({
+      status: 'success',
+      // requestedAt: req.requestTime, Uncomment if `req.requestTime` is defined earlier
+      results: tours.length,
+      data: {
+        tours
+      }
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({
+      status: 'fail',
+      message: err
+    });
+  }
 };
-
 exports.getTour = async (req, res) => {
   const tour = await Tour.findById(req.params.id);
   res.status(200).json({
