@@ -11,12 +11,25 @@ exports.getAllTours = async (req, res) => {
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach(el => delete queryObj[el]);
 
-    const tours = await Tour.find(queryObj);
+    let query = Tour.find(queryObj);
     // Uncomment and use .where() method for chaining specific queries:
     // .where('duration')
     // .equals(5)
     // .where('difficulty')
     // .equals('easy');
+
+    if (req.query.sort) {
+      const shortby = req.query.sort.split(',').join(' ');
+      query = query.sort(shortby);
+    }
+
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
+    const tours = await query;
 
     res.status(200).json({
       status: 'success',
